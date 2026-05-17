@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     python-is-python3 \
     ros-noetic-moveit-msgs \
     ros-noetic-moveit-ros-planning-interface \
+    ros-noetic-xacro \
     git \
     && rm -rf /var/lib/apt/lists/*
 
