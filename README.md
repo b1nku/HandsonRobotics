@@ -187,3 +187,10 @@ Meta does not ship a Linux binary for the XR Simulator (automatically triggered 
                 return false;
             }
 ```
+
+4. In case off DllNotFoundException libdl:
+On modern glibc (Arch and CachyOS) libdl was merged into libc. We can create a symlink to circumvent this issue.
+
+```bash
+sudo ln -s /usr/lib/libdl.so.2 /usr/lib/libdl.so
+```
