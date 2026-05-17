@@ -29,8 +29,15 @@ A 6 DOF arm (versus a mobile platform such as TurtleBot) is chosen because it ha
 | Niryo One ROS messages generated | Done (`Assets/RosMessages/NiryoOne/`) |
 | MoveIt ROS messages generated | Done (`Assets/RosMessages/Moveit/`, `NiryoMoveit/`) |
 | Main scene | Exists (`Assets/Scenes/MainScene.unity`) |
-| In-scene robot model / prefabs | Not yet imported |
-| Any visualisation features | Not yet implemented |
+| In-scene robot model / prefabs | Imported + Working (Wif jank XD) |
+| Any visualisation features | Started / Ongoing |
+
+| Direction | Status |
+|---|---|
+| A | Ongoing |
+| B | Soon™ |
+| C | Soon™ |
+| D | Done |
 
 ---
 
