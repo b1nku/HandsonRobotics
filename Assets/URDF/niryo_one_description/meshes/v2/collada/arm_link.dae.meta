@@ -3,7 +3,77 @@ guid: 860c2e3e8770bb0958299b0c29ae49d3
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl1
+    second: {fileID: 2100000, guid: 3a5d7d60d88fb2cbd9bf282256fbc4dc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl10
+    second: {fileID: 2100000, guid: 104f5246a0c6b33668460927bcc76037, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl11
+    second: {fileID: 2100000, guid: fa1766291db4dd57187fc28e5f956c5f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl2
+    second: {fileID: 2100000, guid: 48608203821234b8491a161cfccb27d7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl3
+    second: {fileID: 2100000, guid: bba75eb4528b2b57796658d42f24347f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl4
+    second: {fileID: 2100000, guid: 1bbc146effc014dad89a3a6028d754e7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl5
+    second: {fileID: 2100000, guid: 3dbc8457fcee9c83a84497ab57b3cd79, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl6
+    second: {fileID: 2100000, guid: b6a52cee2c2207d36b292735678cd473, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl8
+    second: {fileID: 2100000, guid: eecd2991c55b5a119839e1e54c06e6c1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtl9
+    second: {fileID: 2100000, guid: dbc83a5a2db962adb817800e2e86dca5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtla
+    second: {fileID: 2100000, guid: 0a240823a2bb0f1ea81f36c14eda79be, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mtlb
+    second: {fileID: 2100000, guid: 08b77d73871c038299dd2d56135789aa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: texture
+    second: {fileID: 2100000, guid: e8ae3e4596932f3b09e3f2285be00868, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: texture7
+    second: {fileID: 2100000, guid: 6568d22641f2d00f58edc3ee414e1ebe, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
