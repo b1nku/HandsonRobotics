@@ -1,0 +1,20 @@
+services:
+  roscore:
+    build: .
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=roscore
+    command: roscore
+    restart: unless-stopped
+
+  ros-tcp-endpoint:
+    build: .
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=ros-tcp-endpoint
+    ports:
+      - "${TCP_PORT:-10000}:10000"
+    command: bash -c "until rostopic list >/dev/null 2>&1; do echo 'Waiting for roscore...'; sleep 1; done; rosrun ros_tcp_endpoint default_server_endpoint.py --tcp_ip 0.0.0.0 --tcp_port 10000"
+    depends_on:
+      - roscore
+    restart: unless-stopped
