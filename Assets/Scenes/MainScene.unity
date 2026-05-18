@@ -2413,8 +2413,8 @@ MonoBehaviour:
   _temperatureLabel: {fileID: 971324274}
   _voltageLabel: {fileID: 1356956953}
   _errorLabel: {fileID: 598866345}
-  _offsetForward: 0.15
-  _offsetUp: 0.08
+  _offsetForward: 0
+  _offsetUp: 0.05
 --- !u!223 &400844412
 Canvas:
   m_ObjectHideFlags: 0
