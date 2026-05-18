@@ -1,4 +1,5 @@
 using System;
+using HandsOnRobotics.UI;
 using RosMessageTypes.Sensor;
 using RosMessageTypes.NiryoOne;
 using Unity.Robotics.ROSTCPConnector;
@@ -37,9 +38,26 @@ namespace HandsOnRobotics.ROS
         void Start()
         {
             var ros = ROSConnection.GetOrCreateInstance();
-            ros.Subscribe<JointStateMsg>(_jointStateTopic, msg => OnJointState?.Invoke(msg));
-            ros.Subscribe<HardwareStatusMsg>(_hardwareStatusTopic, msg => OnHardwareStatus?.Invoke(msg));
-            ros.Subscribe<RobotStateMsg>(_robotStateTopic, msg => OnRobotState?.Invoke(msg));
+
+            TopicMonitorPanel.Register(_jointStateTopic,     "sensor_msgs/JointState");
+            TopicMonitorPanel.Register(_hardwareStatusTopic, "niryo_one_msgs/HardwareStatus");
+            TopicMonitorPanel.Register(_robotStateTopic,     "niryo_one_msgs/RobotState");
+
+            ros.Subscribe<JointStateMsg>(_jointStateTopic, msg =>
+            {
+                TopicMonitorPanel.RecordMessage(_jointStateTopic);
+                OnJointState?.Invoke(msg);
+            });
+            ros.Subscribe<HardwareStatusMsg>(_hardwareStatusTopic, msg =>
+            {
+                TopicMonitorPanel.RecordMessage(_hardwareStatusTopic);
+                OnHardwareStatus?.Invoke(msg);
+            });
+            ros.Subscribe<RobotStateMsg>(_robotStateTopic, msg =>
+            {
+                TopicMonitorPanel.RecordMessage(_robotStateTopic);
+                OnRobotState?.Invoke(msg);
+            });
         }
 
         void OnDestroy()
