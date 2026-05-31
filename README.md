@@ -29,14 +29,15 @@ A 6 DOF arm (versus a mobile platform such as TurtleBot) is chosen because it ha
 | Niryo One ROS messages generated | Done (`Assets/RosMessages/NiryoOne/`) |
 | MoveIt ROS messages generated | Done (`Assets/RosMessages/Moveit/`, `NiryoMoveit/`) |
 | Main scene | Exists (`Assets/Scenes/MainScene.unity`) |
-| In-scene robot model / prefabs | Imported + Working (Wif jank XD) |
-| Any visualisation features | Started / Ongoing |
+| In-scene robot model / prefabs | Imported + working (with jank) |
+| Floating tablet UI | Done (`FloatingTablet`, `TabletViewController`) |
+| Visualisation features | See direction table below |
 
 | Direction | Status |
 |---|---|
-| A | Ongoing |
-| B | Soon™ |
-| C | Soon™ |
+| A | Done |
+| B | Done |
+| C | In progress |
 | D | Done |
 
 ---
@@ -59,6 +60,11 @@ An operator watching the physical arm sees motion but has no access to the force
 
 **Research value:** Direct test of whether spatially-registered hidden-variable disclosure lowers workload compared to a traditional panel or external display.
 
+**Implementation:**
+- `JointRing`: compact radial-fill health ring manually aligned to each joint plane. Color codes health state (green/yellow/red) from temperature, voltage, and hardware error thresholds. The ring does not billboard; it sits in the joint's plane as a physical-feeling indicator. Optional `Overlay Geometry` flag renders it in front of all geometry (ZTest Always via `unity_GUIZTestMode`).
+- `JointDetailPanel`: a single shared floating panel that appears on head-gaze dwell (0.3 s default). Shows joint name, position (degrees), velocity (rad/s), effort (Nm), temperature, voltage, and error code. Positions itself between the gazed ring and the camera to avoid clipping through the arm. Renders with TMP Distance Field Overlay shader.
+- `JointStateVisualiser`: discovers `JointRing` components via `NiryoOneJointMap`, routes `JointStateMsg` by joint name and `HardwareStatusMsg` by motor index order. Head-gaze raycast drives the detail panel via `SphereCollider` on each ring.
+
 ---
 
 ### B: Live ROS Topic Inspector
@@ -79,11 +85,16 @@ Having live topic values surfaced directly within the VR experience enables the 
 
 **Research value:** Allows comparison of a "dashboard in VR" interaction model against external monitor workflows, and exploration of how information density in the panel affects cognitive load.
 
+**Implementation:**
+- `TopicMonitorPanel`: live topic monitor displayed on the floating tablet. Each registered topic gets a row showing topic name, message type, publish rate (Hz calculated over a 3 s sliding window), and a color-coded status dot (grey = never received, green = healthy, yellow = stale, red = dropped). Extensible: any new subscriber calls `TopicMonitorPanel.Register()` and `TopicMonitorPanel.RecordMessage()` and a row appears automatically.
+- `TFFrameDisplay` + `TFFrameVisualiser`: replicates RViz's TF display in VR. At runtime, creates colored XYZ axis lines (red/green/blue, tapered to indicate direction) at each joint link, grey connection lines tracing the kinematic chain, and billboarded frame name labels. Configurable axis length, width, and label size. Toggle all frames via `TFFrameDisplay.Toggle()`.
+- RViz feature parity goal: robot operators should not feel they are missing information available in RViz. Both the topic monitor and TF display were designed with this in mind.
+
 ---
 
 ### C: Trajectory Preview & Motion Intent
 
-**Objective:** Before the robot executes a planned move, render its intended trajectory as a ghost/preview in VR, as a translucent shadow of the arm stepping through each waypoint, or a ribbon tracing the end-effector path. The operator sees what the robot is *about to do* before it does it.
+**Objective:** Before the robot executes a planned move, render its intended trajectory as a ghost/preview in VR, as a translucent shadow of the arm stepping through each waypoint, or a ribbon tracing the end-effector path. The operator sees what the robot is *about to do* before it does it. Extends to VR-native trajectory authoring: the operator places a target in 3D space, MoveIt plans to it, and the result is previewed before anything moves on real hardware.
 
 **Hidden variables surfaced:**
 - Full planned joint trajectory (`TrajectoryPlanMsg.trajectory` → `RobotTrajectoryMsg.joint_trajectory`)
@@ -93,9 +104,24 @@ Having live topic values surfaced directly within the VR experience enables the 
 - Planning group (`TrajectoryPlanMsg.group_name`)
 
 **What we stand to gain:**  
-MoveIt may move the arm in an inappropriate way, so giving the operator a preview before execution may prevent accidents.
+MoveIt may move the arm in an inappropriate way, so giving the operator a preview before execution may prevent accidents. More importantly, letting the operator author trajectories by placing a spatial target in VR (rather than typing joint angles or using a 2D interface) is the kind of interaction RViz cannot offer. If it works, it also removes the need for a teach pendant.
 
-**Research value:** Tests whether pre-execution intent disclosure reduces operator errors and perceived workload; could also support studies on human–robot trust calibration.
+**Research value:** Tests whether pre-execution intent disclosure reduces operator errors and perceived workload; could also support studies on human-robot trust calibration. The VR trajectory authoring interaction is a novel research contribution in itself.
+
+**Implementation (in progress):**
+- `TrajectoryTarget`: a grabbable sphere the operator places at the desired end-effector position. Driven by Meta Interaction SDK hand grab. The sphere's world pose is sent to MoveIt as `pick_pose`.
+- `GhostArm`: transparent mesh clone of the robot hierarchy, created at runtime. Animated through MoveIt trajectory waypoints with joint angle interpolation. Also used to precompute the end-effector world path for the ribbon.
+- `MoveItPlanner`: wraps `niryo_moveit/MoverService`. Sends current joint angles and target pose; receives `RobotTrajectoryMsg[]`. Target pose is converted from Unity world space to robot-local space before FLU coordinate conversion.
+- `TrajectoryPathVisualiser`: LineRenderer ribbon tracing the end-effector world path through all trajectory waypoints.
+- `TrajectoryController`: state machine (Idle, Targeting, Planning, Previewing) driven by tablet buttons. Caches current joint angles from `ROSSubscriptionManager`. Execute button is present but wired to a stub pending a robot command publisher.
+
+---
+
+### Floating Tablet UI
+
+All operator-facing panels live on a single world-space floating tablet. The tablet is a grabbable rigid body with cylindrical handles on the left and right edges. When released, it retains the hand's velocity and drifts in place (no gravity, low drag) -- the microgravity interaction model felt appropriate for a tool meant to reduce cognitive load. Grab handles use the Meta Interaction SDK; the `FloatingTablet` script configures the `Rigidbody` and provides a `ReturnHome()` method.
+
+`TabletViewController` manages named views via prev/next navigation buttons with a view name label. Adding a new view requires only appending to the `_views` and `_viewNames` arrays in the Inspector. Current views: Topics (topic monitor), Planning (trajectory authoring controls).
 
 ---
 
