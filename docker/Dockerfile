@@ -5,8 +5,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get install -y \
     python3-catkin-tools \
     python-is-python3 \
-    ros-noetic-moveit-msgs \
-    ros-noetic-moveit-ros-planning-interface \
+    ros-noetic-moveit \
     ros-noetic-xacro \
     git \
     && rm -rf /var/lib/apt/lists/*
@@ -35,11 +34,17 @@ WORKDIR /catkin_ws
 RUN apt-get update && \
     source /opt/ros/noetic/setup.bash && \
     rosdep install \
-        --from-paths src/ROS-TCP-Endpoint src/niryo_one_ros/niryo_one_msgs src/niryo_moveit \
-        --ignore-src -r -y \
-        --skip-keys="moveit_fake_controller_manager" && \
-    catkin build ros_tcp_endpoint niryo_one_msgs niryo_moveit && \
+        --from-paths src/ROS-TCP-Endpoint src/niryo_one_ros/niryo_one_msgs \
+            src/niryo_one_ros/niryo_one_description src/niryo_one_ros/niryo_one_moveit_config \
+            src/niryo_moveit \
+        --ignore-src -r -y && \
+    catkin build ros_tcp_endpoint niryo_one_msgs niryo_one_description niryo_one_moveit_config niryo_moveit && \
     rm -rf /var/lib/apt/lists/*
+
+# Override the Unity Robotics Hub pick-and-place mover.py with our
+# simplified single-trajectory planner (no place_pose, no pre/post grasp).
+COPY mover.py /catkin_ws/src/niryo_moveit/scripts/mover.py
+RUN chmod +x /catkin_ws/src/niryo_moveit/scripts/mover.py
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

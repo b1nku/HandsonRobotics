@@ -57,6 +57,7 @@ namespace HandsOnRobotics.Robot
         /* Called by the Plan tablet button. */
         public void Plan()
         {
+            Debug.Log($"[TrajectoryController] Plan() called. Current state: {_state}, planner: {(_planner != null ? "assigned" : "NULL")}");
             if (_state != State.Targeting) return;
             if (_planner == null) { Debug.LogError("[TrajectoryController] MoveItPlanner not assigned."); return; }
 

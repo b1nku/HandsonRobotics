@@ -18,3 +18,29 @@ services:
     depends_on:
       - roscore
     restart: unless-stopped
+
+  moveit:
+    build: .
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=moveit
+    command: >
+      bash -c "until rostopic list >/dev/null 2>&1; do echo 'Waiting for roscore...'; sleep 1; done;
+      source /catkin_ws/devel/setup.bash &&
+      roslaunch niryo_one_moveit_config demo.launch use_rviz:=false"
+    depends_on:
+      - roscore
+    restart: unless-stopped
+
+  niryo-moveit:
+    build: .
+    environment:
+      - ROS_MASTER_URI=http://roscore:11311
+      - ROS_HOSTNAME=niryo-moveit
+    command: >
+      bash -c "until rosservice list 2>/dev/null | grep -q move_group; do echo 'Waiting for move_group...'; sleep 2; done;
+      source /catkin_ws/devel/setup.bash &&
+      rosrun niryo_moveit mover.py"
+    depends_on:
+      - moveit
+    restart: unless-stopped

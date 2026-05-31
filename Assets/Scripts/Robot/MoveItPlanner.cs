@@ -48,20 +48,27 @@ namespace HandsOnRobotics.Robot
                 ? Quaternion.Inverse(_robotBase.rotation) * targetWorldRot
                 : targetWorldRot;
 
+            var rosPos = localPos.To<FLU>();
+            var rosRot = localRot.To<FLU>();
+            Debug.Log($"[MoveItPlanner] Sending plan request to '{_serviceName}'. " +
+                      $"Target (ROS): pos=({rosPos.x:F3},{rosPos.y:F3},{rosPos.z:F3}) " +
+                      $"joints=[{string.Join(", ", Array.ConvertAll(currentJoints, j => j.ToString("F3")))}]");
+
             var request = new MoverServiceRequest
             {
                 joints_input = new NiryoMoveitJointsMsg { joints = currentJoints },
-                pick_pose    = new PoseMsg
-                {
-                    position    = localPos.To<FLU>(),
-                    orientation = localRot.To<FLU>()
-                },
-                place_pose = new PoseMsg()
+                pick_pose    = new PoseMsg { position = rosPos, orientation = rosRot },
+                place_pose   = new PoseMsg()
             };
 
             ROSConnection.GetOrCreateInstance().SendServiceMessage<MoverServiceResponse>(
                 _serviceName, request,
-                response => onResponse?.Invoke(response.trajectories));
+                response =>
+                {
+                    int count = response.trajectories?.Length ?? 0;
+                    Debug.Log($"[MoveItPlanner] Response received: {count} trajectory/trajectories.");
+                    onResponse?.Invoke(response.trajectories);
+                });
         }
     }
 }

@@ -42,8 +42,8 @@ namespace HandsOnRobotics.Robot
             if (_ghostMaterial == null) Debug.LogWarning("[GhostArm] Ghost Material not assigned -- ghost will be invisible.");
 
             var ghostRoot = CloneHierarchy(_robotRoot, transform);
-            ghostRoot.localPosition = Vector3.zero;
-            ghostRoot.localRotation = Quaternion.identity;
+            ghostRoot.position = _robotRoot.position;
+            ghostRoot.rotation = _robotRoot.rotation;
 
             var joints = map.AllJoints;
             int count  = joints.Count;
@@ -65,6 +65,22 @@ namespace HandsOnRobotics.Robot
                 _neutralRotations[i] = _ghostJoints[i] != null ? _ghostJoints[i].localRotation : Quaternion.identity;
                 if (_ghostJoints[i] != null) resolved++;
                 else Debug.LogWarning($"[GhostArm] Could not find '{realLink.name}' in cloned hierarchy.");
+
+                // Auto-detect rotation axis from ArticulationBody on the real link.
+                // parentAnchorRotation gives the anchor frame in the parent link's space;
+                // revolute joints rotate around that anchor's X axis.
+                var ab = realLink.GetComponent<ArticulationBody>();
+                if (ab != null && ab.jointType == ArticulationJointType.RevoluteJoint)
+                {
+                    var detected = ab.parentAnchorRotation * Vector3.right;
+                    if (i < _jointAxes.Length) _jointAxes[i] = detected;
+                    Debug.Log($"[GhostArm] Joint {i} ({joints[i].rosName}): axis auto-detected = {detected}");
+                }
+                else
+                {
+                    var fallback = i < _jointAxes.Length ? _jointAxes[i] : Vector3.forward;
+                    Debug.Log($"[GhostArm] Joint {i} ({joints[i].rosName}): no ArticulationBody, using configured axis = {fallback}");
+                }
             }
 
             _endEffector = _ghostJoints[count - 1];
@@ -79,8 +95,11 @@ namespace HandsOnRobotics.Robot
             {
                 if (_ghostJoints[i] == null) continue;
                 var axis = i < _jointAxes.Length ? _jointAxes[i] : Vector3.forward;
-                _ghostJoints[i].localRotation = _neutralRotations[i]
-                    * Quaternion.AngleAxis((float)(Mathf.Rad2Deg * angles[i]), axis);
+                // Axis is in parent-local space; left-multiply so the delta operates
+                // in parent frame with the neutral rotation as the base.
+                _ghostJoints[i].localRotation =
+                    Quaternion.AngleAxis((float)(Mathf.Rad2Deg * angles[i]), axis)
+                    * _neutralRotations[i];
             }
         }
 
