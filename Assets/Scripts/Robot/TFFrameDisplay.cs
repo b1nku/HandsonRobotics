@@ -27,7 +27,9 @@ namespace HandsOnRobotics.Robot
         [SerializeField] bool _showParentLines = true;
 
         [Header("Visibility")]
-        [SerializeField] bool _visibleOnStart = true;
+        [SerializeField] bool _visibleOnStart  = true;
+        [Tooltip("Render axes and parent lines on top of all geometry (ZTest Always).")]
+        [SerializeField] bool _overlayGeometry = true;
 
         readonly List<TFFrameVisualiser> _frames = new();
         bool _visible;
@@ -63,7 +65,8 @@ namespace HandsOnRobotics.Robot
                     _axisWidth,
                     _labelFontSize,
                     _showLabels,
-                    _showParentLines);
+                    _showParentLines,
+                    _overlayGeometry);
 
                 _frames.Add(vis);
             }

@@ -16,12 +16,16 @@ namespace HandsOnRobotics.Robot
         Transform    _parentLink;
         float        _axisLength;
 
+        bool _overlay;
+
         public void Initialise(string frameName, Transform parentLink,
                                float axisLength, float axisWidth,
-                               float labelSize,  bool showLabel, bool showParentLine)
+                               float labelSize,  bool showLabel, bool showParentLine,
+                               bool overlayGeometry = false)
         {
             _parentLink = parentLink;
             _axisLength = axisLength;
+            _overlay    = overlayGeometry;
 
             _xAxis = CreateAxis("X", new Color(0.9f, 0.15f, 0.15f), axisWidth);
             _yAxis = CreateAxis("Y", new Color(0.2f, 0.85f, 0.2f),  axisWidth);
@@ -83,8 +87,16 @@ namespace HandsOnRobotics.Robot
         {
             var go = new GameObject(goName);
             go.transform.SetParent(transform);
-            var lr = go.AddComponent<LineRenderer>();
-            lr.material         = new Material(Shader.Find("Sprites/Default"));
+            var lr  = go.AddComponent<LineRenderer>();
+            var mat = new Material(Shader.Find(_overlay ? "Universal Render Pipeline/Unlit" : "Sprites/Default"));
+            if (_overlay)
+            {
+                mat.SetFloat("_ZTest",  (float)UnityEngine.Rendering.CompareFunction.Always);
+                mat.SetFloat("_Surface", 0f); // opaque
+                mat.renderQueue = 4000;
+            }
+            mat.color           = color;
+            lr.material         = mat;
             lr.startColor       = color;
             lr.endColor         = color;
             lr.startWidth       = width;
