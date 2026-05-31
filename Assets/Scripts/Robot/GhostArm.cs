@@ -37,11 +37,9 @@ namespace HandsOnRobotics.Robot
         void Start()
         {
             var map = NiryoOneJointMap.Instance;
-            if (map == null || _robotRoot == null)
-            {
-                Debug.LogError("[GhostArm] Missing NiryoOneJointMap or robot root.");
-                return;
-            }
+            if (map == null)        { Debug.LogError("[GhostArm] NiryoOneJointMap instance not found."); return; }
+            if (_robotRoot == null) { Debug.LogError("[GhostArm] Robot Root not assigned."); return; }
+            if (_ghostMaterial == null) Debug.LogWarning("[GhostArm] Ghost Material not assigned -- ghost will be invisible.");
 
             var ghostRoot = CloneHierarchy(_robotRoot, transform);
             ghostRoot.localPosition = Vector3.zero;
@@ -53,17 +51,24 @@ namespace HandsOnRobotics.Robot
             _neutralRotations = new Quaternion[count];
             _rosNames         = new string[count];
 
+            int resolved = 0;
             for (int i = 0; i < count; i++)
             {
                 var realLink = joints[i].link;
-                _ghostJoints[i]      = FindByName(ghostRoot, realLink.name);
-                _neutralRotations[i] = _ghostJoints[i] != null
-                    ? _ghostJoints[i].localRotation
-                    : Quaternion.identity;
                 _rosNames[i] = joints[i].rosName;
+                if (realLink == null)
+                {
+                    Debug.LogWarning($"[GhostArm] Joint {i} ({joints[i].rosName}): link not assigned in NiryoOneJointMap.");
+                    continue;
+                }
+                _ghostJoints[i]      = FindByName(ghostRoot, realLink.name);
+                _neutralRotations[i] = _ghostJoints[i] != null ? _ghostJoints[i].localRotation : Quaternion.identity;
+                if (_ghostJoints[i] != null) resolved++;
+                else Debug.LogWarning($"[GhostArm] Could not find '{realLink.name}' in cloned hierarchy.");
             }
 
             _endEffector = _ghostJoints[count - 1];
+            Debug.Log($"[GhostArm] Initialised: {resolved}/{count} joints resolved, end-effector = {(_endEffector != null ? _endEffector.name : "NULL")}.");
             gameObject.SetActive(false);
         }
 
