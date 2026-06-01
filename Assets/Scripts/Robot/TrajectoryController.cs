@@ -27,14 +27,24 @@ namespace HandsOnRobotics.Robot
         [SerializeField] MoveItPlanner             _planner;
         [SerializeField] TrajectoryPathVisualiser  _pathVisualiser;
 
+        [Header("Direction F: workspace envelope")]
+        [SerializeField] WorkspaceEnvelope _workspaceEnvelope;
+
         [Header("Tablet UI")]
         [SerializeField] TextMeshProUGUI _statusLabel;
         [SerializeField] UnityEngine.UI.Button _planButton;
         [SerializeField] UnityEngine.UI.Button _executeButton;
         [SerializeField] UnityEngine.UI.Button _cancelButton;
+        [SerializeField] UnityEngine.UI.Button _resetTargetButton;
+
+        [Header("Direction H: ROS debug overlay")]
+        [SerializeField] HandsOnRobotics.UI.ROSDebugOverlay _rosDebugOverlay;
+        [SerializeField] UnityEngine.UI.Button _debugToggleButton;
 
         State    _state = State.Idle;
         double[] _currentJoints = new double[6];
+        Vector3    _targetSpawnPos;
+        Quaternion _targetSpawnRot;
 
         void OnEnable()  => ROSSubscriptionManager.OnJointState += CacheJoints;
         void OnDisable() => ROSSubscriptionManager.OnJointState -= CacheJoints;
@@ -43,6 +53,10 @@ namespace HandsOnRobotics.Robot
         {
             if (_trajectoryTarget != null)
                 _trajectoryTarget.gameObject.SetActive(false);
+
+            _resetTargetButton?.onClick.AddListener(ResetTarget);
+            _debugToggleButton?.onClick.AddListener(() => _rosDebugOverlay?.Toggle());
+
             SetState(State.Idle);
         }
 
@@ -51,7 +65,20 @@ namespace HandsOnRobotics.Robot
         {
             if (_state != State.Idle) return;
             _trajectoryTarget.gameObject.SetActive(true);
+            _targetSpawnPos = _trajectoryTarget.position;
+            _targetSpawnRot = _trajectoryTarget.rotation;
             SetState(State.Targeting);
+        }
+
+        /* Direction E: snaps the target sphere back to where it appeared when activated.
+           Clears any current preview so the user can re-plan from the fresh position. */
+        public void ResetTarget()
+        {
+            if (_state != State.Targeting && _state != State.Previewing) return;
+            _trajectoryTarget.SetPositionAndRotation(_targetSpawnPos, _targetSpawnRot);
+            _ghostArm?.StopAnimation();
+            _pathVisualiser?.Clear();
+            if (_state == State.Previewing) SetState(State.Targeting);
         }
 
         /* Called by the Plan tablet button. */
@@ -148,9 +175,12 @@ namespace HandsOnRobotics.Robot
                 _                => ""
             };
 
-            if (_planButton)    _planButton.interactable    = next == State.Targeting;
-            if (_executeButton) _executeButton.interactable = next == State.Previewing;
-            if (_cancelButton)  _cancelButton.interactable  = next != State.Idle && next != State.Planning;
+            if (_planButton)         _planButton.interactable         = next == State.Targeting;
+            if (_executeButton)      _executeButton.interactable      = next == State.Previewing;
+            if (_cancelButton)       _cancelButton.interactable       = next != State.Idle && next != State.Planning;
+            if (_resetTargetButton)  _resetTargetButton.interactable  = next == State.Targeting || next == State.Previewing;
+
+            _workspaceEnvelope?.SetVisible(next == State.Targeting);
         }
     }
 }

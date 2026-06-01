@@ -82,5 +82,19 @@ namespace HandsOnRobotics.UI
             stats.Times.Enqueue(Time.time);
             stats.LastReceived = Time.time;
         }
+
+        /* Returns a snapshot of all registered topics for external consumers (e.g. ROSDebugOverlay). */
+        public static System.Collections.Generic.IEnumerable<(string topic, string type, float hz, float secSinceLast)>
+            GetTopicStats()
+        {
+            if (Instance == null) yield break;
+            float now = Time.time;
+            foreach (var (topic, stats) in Instance._topics)
+            {
+                float hz          = stats.Times.Count / Instance._hzWindow;
+                float secSinceLast = stats.LastReceived < 0f ? -1f : now - stats.LastReceived;
+                yield return (topic, stats.MessageType, hz, secSinceLast);
+            }
+        }
     }
 }
