@@ -18941,7 +18941,7 @@ MonoBehaviour:
   requestBodyTrackingPermissionOnStartup: 0
   requestFaceTrackingPermissionOnStartup: 0
   requestEyeTrackingPermissionOnStartup: 1
-  requestScenePermissionOnStartup: 1
+  requestScenePermissionOnStartup: 0
   requestRecordAudioPermissionOnStartup: 0
   requestPassthroughCameraAccessPermissionOnStartup: 1
   _localDimming: 1
@@ -19545,7 +19545,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1076900027}
-  - component: {fileID: 1076900028}
   m_Layer: 0
   m_Name: '[ROBOT]'
   m_TagString: Untagged
@@ -19571,19 +19570,6 @@ Transform:
   - {fileID: 1656089678}
   m_Father: {fileID: 360550661}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1076900028
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1076900026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e87149cedfa9e468aa2e51fba4d15fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ArticulationRootFollower
-  _root: {fileID: 230128999}
 --- !u!1 &1078271762
 GameObject:
   m_ObjectHideFlags: 0
@@ -28712,6 +28698,7 @@ Transform:
   - {fileID: 73390416}
   - {fileID: 410087041}
   - {fileID: 841611280}
+  - {fileID: 2107661043}
   m_Father: {fileID: 360550661}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1844959276
@@ -32843,7 +32830,6 @@ GameObject:
   - component: {fileID: 2088696478}
   - component: {fileID: 2088696477}
   - component: {fileID: 2088696479}
-  - component: {fileID: 2088696480}
   m_Layer: 0
   m_Name: CenterEyeAnchor
   m_TagString: MainCamera
@@ -32969,22 +32955,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &2088696480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2088696475}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8e7ff1cdf4c4e74db00c3684108bc9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Oculus.VR::UnityEngine.EventSystems.OVRPhysicsRaycaster
-  m_EventMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  sortOrder: 0
 --- !u!1 &2094107780
 GameObject:
   m_ObjectHideFlags: 0
@@ -33188,7 +33158,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -33528,7 +33498,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2072153501}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1828606001}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2137584206
 PrefabInstance:
@@ -34193,4 +34163,3 @@ SceneRoots:
   - {fileID: 360550661}
   - {fileID: 832575519}
   - {fileID: 63106643}
-  - {fileID: 2107661043}

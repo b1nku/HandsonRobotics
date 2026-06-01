@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simplified MoverService server — plans a single trajectory from the current
+Simplified MoverService server - plans a single trajectory from the current
 joint state to the requested pick_pose. Ignores place_pose entirely (not
 needed for trajectory preview). Returns one RobotTrajectory or an empty list.
 """

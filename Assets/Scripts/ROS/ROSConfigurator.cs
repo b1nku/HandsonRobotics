@@ -16,7 +16,8 @@ namespace HandsOnRobotics.ROS
       1. Add a new panel to the tablet (add to TabletViewController _views).
       2. Add two TMP_InputFields (IP and Port), a Save button, and two status labels.
       3. Wire references in the Inspector on this component.
-      4. The Quest system keyboard appears automatically when an InputField is focused. */
+      4. Focusing an InputField calls TouchScreenKeyboard.Open() to raise the Quest
+         system keyboard; OpenKeyboard/Update poll its text back into the field. */
     [DefaultExecutionOrder(-100)]
     public class ROSConfigurator : MonoBehaviour
     {
@@ -26,12 +27,15 @@ namespace HandsOnRobotics.ROS
         [SerializeField] string _defaultIP   = "192.168.1.100";
         [SerializeField] int    _defaultPort = 10000;
 
-        [Header("Tablet — ROS Config view")]
+        [Header("Tablet - ROS Config view")]
         [SerializeField] TMP_InputField  _ipInput;
         [SerializeField] TMP_InputField  _portInput;
         [SerializeField] Button          _saveButton;
         [SerializeField] TextMeshProUGUI _activeLabel;   // "Active: x.x.x.x:port"
-        [SerializeField] TextMeshProUGUI _pendingLabel;  // "Saved — restart to apply"
+        [SerializeField] TextMeshProUGUI _pendingLabel;  // "Saved - restart to apply"
+
+        TouchScreenKeyboard _overlayKeyboard;
+        TMP_InputField      _activeField;
 
         void Awake()
         {
@@ -81,8 +85,41 @@ namespace HandsOnRobotics.ROS
 
             _saveButton?.onClick.AddListener(Save);
 
+            _ipInput?.onSelect.AddListener(_   => OpenKeyboard(_ipInput));
+            _portInput?.onSelect.AddListener(_ => OpenKeyboard(_portInput));
+
             SetPendingVisible(false);
             RefreshActiveLabel();
+        }
+
+        void OpenKeyboard(TMP_InputField field)
+        {
+            _activeField      = field;
+            _overlayKeyboard  = TouchScreenKeyboard.Open(
+                field.text, TouchScreenKeyboardType.Default);
+        }
+
+        void Update()
+        {
+            if (_overlayKeyboard == null || _activeField == null) return;
+            var status = _overlayKeyboard.status;
+            if (status == TouchScreenKeyboard.Status.Visible)
+            {
+                _activeField.text = _overlayKeyboard.text;
+            }
+            else if (status == TouchScreenKeyboard.Status.Done ||
+                     status == TouchScreenKeyboard.Status.LostFocus)
+            {
+                _activeField.text = _overlayKeyboard.text;
+                _overlayKeyboard  = null;
+                _activeField      = null;
+            }
+            else if (status == TouchScreenKeyboard.Status.Canceled)
+            {
+                // Dismissed without confirming: drop the reference, leave the field as-is.
+                _overlayKeyboard  = null;
+                _activeField      = null;
+            }
         }
 
         public void Save()
@@ -90,7 +127,18 @@ namespace HandsOnRobotics.ROS
             string ip   = _ipInput  != null ? _ipInput.text.Trim()  : string.Empty;
             string port = _portInput != null ? _portInput.text.Trim() : string.Empty;
 
-            if (string.IsNullOrEmpty(ip)) return;
+            // Validate here too: text set programmatically from the system keyboard
+            // bypasses the field's onValidateInput / onEndEdit guards.
+            if (!Regex.IsMatch(ip, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"))
+            {
+                SetPendingVisible(false);
+                if (_pendingLabel != null)
+                {
+                    _pendingLabel.text    = "Invalid IP";
+                    _pendingLabel.enabled = true;
+                }
+                return;
+            }
             if (!int.TryParse(port, out int portNum) || portNum < 1 || portNum > 65535)
                 portNum = _defaultPort;
 
@@ -111,7 +159,7 @@ namespace HandsOnRobotics.ROS
         void SetPendingVisible(bool visible)
         {
             if (_pendingLabel == null) return;
-            _pendingLabel.text    = visible ? "Saved — restart to apply" : string.Empty;
+            _pendingLabel.text    = visible ? "Saved - restart to apply" : string.Empty;
             _pendingLabel.enabled = visible;
         }
     }

@@ -12,7 +12,7 @@ namespace HandsOnRobotics.Robot
     A hemisphere would be more accurate but a full sphere is clear enough as a hint. */
     public class WorkspaceEnvelope : MonoBehaviour
     {
-        [Tooltip("The robot base transform — sphere origin.")]
+        [Tooltip("The robot base transform - sphere origin.")]
         [SerializeField] Transform _robotBase;
 
         [Tooltip("Niryo One nominal max reach (m).")]
@@ -64,7 +64,7 @@ namespace HandsOnRobotics.Robot
             mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
             mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
 
-            // Back-face only — inner surface must NOT render through the table/robot geometry
+            // Back-face only - inner surface must NOT render through the table/robot geometry
             mat.SetFloat("_Cull", (float)UnityEngine.Rendering.CullMode.Back);
 
             return mat;

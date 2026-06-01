@@ -14,7 +14,7 @@ namespace HandsOnRobotics.UI
     Setup in the Inspector:
       1. Create an empty GO on the wall, position and rotate it to face into the room.
       2. Add this component.
-      3. A TextMeshPro 3D label is created at runtime — no Canvas needed.
+      3. A TextMeshPro 3D label is created at runtime - no Canvas needed.
       4. Assign the optional _tabletToggleButton to wire the tablet button automatically. */
     public class ROSDebugOverlay : MonoBehaviour
     {
@@ -24,7 +24,7 @@ namespace HandsOnRobotics.UI
         [Tooltip("Font size in world-space metres.")]
         [SerializeField] float _fontSize = 0.04f;
 
-        [Tooltip("Optional tablet button that calls Toggle() — wire in Inspector.")]
+        [Tooltip("Optional tablet button that calls Toggle() - wire in Inspector.")]
         [SerializeField] UnityEngine.UI.Button _tabletToggleButton;
 
         TextMeshPro _tmp;
@@ -42,7 +42,7 @@ namespace HandsOnRobotics.UI
             _tmp.alignment = TextAlignmentOptions.TopLeft;
             _tmp.color     = new Color(0.9f, 1f, 0.9f);
 
-            // ZTest Always — visible through geometry in the editor Scene view.
+            // ZTest Always - visible through geometry in the editor Scene view.
             // TMP_SDF.shader reads ZTest from the "unity_GUIZTestMode" material property.
             _tmp.fontMaterial = new Material(_tmp.fontSharedMaterial);
             _tmp.fontMaterial.SetFloat("unity_GUIZTestMode",

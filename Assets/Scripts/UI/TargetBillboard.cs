@@ -6,7 +6,7 @@ namespace HandsOnRobotics.UI
     /* Direction G: billboard text label that floats above the trajectory target sphere.
 
     Add this component directly to the trajectory target GameObject (the red sphere).
-    It creates a TextMeshPro 3D object as a child at runtime — no prefab or Canvas needed.
+    It creates a TextMeshPro 3D object as a child at runtime - no prefab or Canvas needed.
     The label always faces the main camera regardless of how the sphere is rotated.
 
     Because it is a child of the target sphere it automatically shows and hides with it;
@@ -33,7 +33,7 @@ namespace HandsOnRobotics.UI
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color     = _color;
 
-            // ZTest Always — visible through other geometry in editor scene view.
+            // ZTest Always - visible through other geometry in editor scene view.
             // TMP_SDF.shader reads ZTest from the "unity_GUIZTestMode" material property.
             tmp.fontMaterial = new Material(tmp.fontSharedMaterial);
             tmp.fontMaterial.SetFloat("unity_GUIZTestMode",

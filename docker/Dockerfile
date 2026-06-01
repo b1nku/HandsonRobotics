@@ -30,7 +30,7 @@ RUN git clone --depth 1 \
 WORKDIR /catkin_ws
 
 # apt lists were cleaned above; refresh before rosdep.
-# moveit_fake_controller_manager was renamed in Noetic final snapshot — skip it.
+# moveit_fake_controller_manager was renamed in Noetic final snapshot - skip it.
 RUN apt-get update && \
     source /opt/ros/noetic/setup.bash && \
     rosdep install \
